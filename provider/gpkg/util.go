@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola/config"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/config"
 )
 
 func replaceTokens(qtext string, zoom uint, extent *geom.Extent) string {

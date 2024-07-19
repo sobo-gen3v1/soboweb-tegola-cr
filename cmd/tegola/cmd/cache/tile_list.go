@@ -10,9 +10,9 @@ import (
 
 	"github.com/go-spatial/cobra"
 	"github.com/go-spatial/geom/slippy"
-	gdcmd "github.com/go-spatial/tegola/internal/cmd"
-	"github.com/go-spatial/tegola/internal/log"
-	"github.com/go-spatial/tegola/provider"
+	gdcmd "github.com/sobo-gen3v1/soboweb-tegola-cr/internal/cmd"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 var (

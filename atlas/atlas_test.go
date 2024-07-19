@@ -2,9 +2,9 @@ package atlas_test
 
 import (
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/internal/env"
-	"github.com/go-spatial/tegola/provider/test"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider/test"
 )
 
 var testLayer1 = atlas.Layer{

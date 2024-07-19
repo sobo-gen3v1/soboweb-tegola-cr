@@ -4,7 +4,7 @@
 package build
 
 import (
-	"github.com/go-spatial/tegola/ui"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/ui"
 )
 
 func ViewerVersion() string {

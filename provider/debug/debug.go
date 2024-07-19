@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/provider"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 const Name = "debug"

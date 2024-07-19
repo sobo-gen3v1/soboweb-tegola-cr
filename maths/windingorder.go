@@ -1,7 +1,7 @@
 package maths
 
 import (
-	"github.com/go-spatial/tegola"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
 )
 
 // WindingOrder the direction the line strings.

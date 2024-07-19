@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	goredis "github.com/go-redis/redis"
-	"github.com/go-spatial/tegola/cache"
-	"github.com/go-spatial/tegola/cache/redis"
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/ttools"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cache/redis"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/ttools"
 )
 
 // TESTENV is the environment variable that must be set to "yes" to run the redis tests.

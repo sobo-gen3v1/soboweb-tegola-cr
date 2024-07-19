@@ -9,11 +9,11 @@ import (
 	"sync"
 
 	"github.com/go-spatial/geom/slippy"
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/cache"
-	"github.com/go-spatial/tegola/internal/log"
-	"github.com/go-spatial/tegola/internal/observer"
-	"github.com/go-spatial/tegola/observability"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/observer"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
 )
 
 var (

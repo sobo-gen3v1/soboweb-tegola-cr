@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-spatial/tegola/config"
-	"github.com/go-spatial/tegola/internal/env"
-	"github.com/go-spatial/tegola/provider"
-	_ "github.com/go-spatial/tegola/provider/debug"
-	_ "github.com/go-spatial/tegola/provider/postgis"
-	_ "github.com/go-spatial/tegola/provider/test"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/config"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
+	_ "github.com/sobo-gen3v1/soboweb-tegola-cr/provider/debug"
+	_ "github.com/sobo-gen3v1/soboweb-tegola-cr/provider/postgis"
+	_ "github.com/sobo-gen3v1/soboweb-tegola-cr/provider/test"
 )
 
 const (

@@ -6,10 +6,10 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	tegolaCache "github.com/go-spatial/tegola/cache"
+	tegolaCache "github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
 
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
 )
 
 const (

@@ -8,8 +8,8 @@ import (
 
 	"github.com/gdey/tbltest"
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola/maths"
-	"github.com/go-spatial/tegola/maths/internal/assert"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/internal/assert"
 )
 
 func TestSplitPoints(t *testing.T) {

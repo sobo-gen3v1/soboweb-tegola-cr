@@ -9,22 +9,22 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/go-spatial/tegola/observability"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
 
 	"github.com/golang/protobuf/proto"
 
 	"github.com/go-spatial/geom"
 	"github.com/go-spatial/geom/encoding/mvt"
 	"github.com/go-spatial/geom/slippy"
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/basic"
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/convert"
-	"github.com/go-spatial/tegola/internal/log"
-	"github.com/go-spatial/tegola/maths/simplify"
-	"github.com/go-spatial/tegola/maths/validate"
-	"github.com/go-spatial/tegola/provider"
-	"github.com/go-spatial/tegola/provider/debug"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/basic"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/convert"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/simplify"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/validate"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider/debug"
 )
 
 // NewWebMercatorMap creates a new map with the necessary default values

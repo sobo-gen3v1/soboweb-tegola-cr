@@ -3,7 +3,7 @@ package points
 import (
 	"math"
 
-	"github.com/go-spatial/tegola/maths"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
 )
 
 func SinArea(pts []maths.Pt) (a float64) {

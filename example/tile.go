@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-spatial/geom/encoding/mvt"
 	"github.com/go-spatial/geom/encoding/wkb"
-	"github.com/go-spatial/tegola/internal/convert"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/convert"
 	"github.com/golang/protobuf/proto"
 )
 

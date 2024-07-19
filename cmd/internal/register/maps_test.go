@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/cmd/internal/register"
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/env"
-	"github.com/go-spatial/tegola/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cmd/internal/register"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 func TestMaps(t *testing.T) {

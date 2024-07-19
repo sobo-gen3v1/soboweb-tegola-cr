@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-spatial/tegola/container/singlelist/point/list"
-	"github.com/go-spatial/tegola/maths"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/container/singlelist/point/list"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
 )
 
 // IntersectionCode encodes weather the intersect point found has the following points.

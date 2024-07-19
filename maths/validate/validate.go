@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/basic"
-	"github.com/go-spatial/tegola/maths"
-	"github.com/go-spatial/tegola/maths/clip"
-	"github.com/go-spatial/tegola/maths/hitmap"
-	"github.com/go-spatial/tegola/maths/makevalid"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/basic"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/clip"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/hitmap"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/makevalid"
 )
 
 func CleanLinestring(g []float64) (l []float64, err error) {

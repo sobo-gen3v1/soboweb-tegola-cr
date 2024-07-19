@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-spatial/geom"
 	"github.com/go-spatial/geom/cmp"
-	"github.com/go-spatial/tegola/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
 
 	_ "github.com/mattn/go-sqlite3"
 )

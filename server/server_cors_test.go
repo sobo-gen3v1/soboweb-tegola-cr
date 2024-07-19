@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-spatial/tegola/server"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/server"
 )
 
 const (

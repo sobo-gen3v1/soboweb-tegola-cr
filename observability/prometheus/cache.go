@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	tegolaCache "github.com/go-spatial/tegola/cache"
-	"github.com/go-spatial/tegola/observability"
+	tegolaCache "github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

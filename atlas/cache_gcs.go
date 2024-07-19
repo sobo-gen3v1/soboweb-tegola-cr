@@ -8,5 +8,5 @@ package atlas
 //
 // go build -tags 'noGCSCache'
 import (
-	_ "github.com/go-spatial/tegola/cache/gcs"
+	_ "github.com/sobo-gen3v1/soboweb-tegola-cr/cache/gcs"
 )

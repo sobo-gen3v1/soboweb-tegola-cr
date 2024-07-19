@@ -3,7 +3,7 @@ package svg
 import (
 	"fmt"
 
-	"github.com/go-spatial/tegola"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
 )
 
 type MinMax struct {

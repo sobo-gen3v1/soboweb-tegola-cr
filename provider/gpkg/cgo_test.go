@@ -6,8 +6,8 @@ package gpkg
 import (
 	"testing"
 
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 // This is a test to just see that the init function is doing something.

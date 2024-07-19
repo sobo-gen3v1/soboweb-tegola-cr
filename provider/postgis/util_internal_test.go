@@ -6,9 +6,9 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/internal/ttools"
-	"github.com/go-spatial/tegola/provider"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/ttools"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 func TestReplaceTokens(t *testing.T) {

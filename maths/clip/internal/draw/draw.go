@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/draw/svg"
-	"github.com/go-spatial/tegola/maths/clip/region"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/draw/svg"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/clip/region"
 )
 
 /*

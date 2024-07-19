@@ -3,7 +3,7 @@ package subject
 import (
 	"testing"
 
-	"github.com/go-spatial/tegola/maths"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
 )
 
 func TestNewSubject(t *testing.T) {

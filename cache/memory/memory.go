@@ -3,8 +3,8 @@ package memory
 import (
 	"sync"
 
-	"github.com/go-spatial/tegola/cache"
-	"github.com/go-spatial/tegola/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
 )
 
 const CacheType  = "memory"

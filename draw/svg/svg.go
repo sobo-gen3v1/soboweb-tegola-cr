@@ -7,8 +7,8 @@ import (
 	"log"
 
 	svg "github.com/ajstarks/svgo"
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/maths"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
 )
 
 const DefaultSpacing = 10

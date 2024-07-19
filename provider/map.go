@@ -1,6 +1,6 @@
 package provider
 
-import "github.com/go-spatial/tegola/internal/env"
+import "github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
 
 // A Map represents a map in the Tegola Config file.
 type Map struct {

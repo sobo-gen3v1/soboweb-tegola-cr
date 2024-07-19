@@ -12,10 +12,10 @@ import (
 
 	vectorTile "github.com/go-spatial/geom/encoding/mvt/vector_tile"
 	"github.com/go-spatial/geom/slippy"
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/internal/p"
-	"github.com/go-spatial/tegola/provider/test"
-	"github.com/go-spatial/tegola/provider/test/emptycollection"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/p"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider/test"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider/test/emptycollection"
 )
 
 func TestMapFilterLayersByZoom(t *testing.T) {

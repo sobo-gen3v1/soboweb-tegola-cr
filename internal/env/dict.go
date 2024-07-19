@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/go-spatial/tegola/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
 )
 
 type Dict map[string]interface{}

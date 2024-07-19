@@ -8,5 +8,5 @@ package atlas
 //
 // go build -tags 'noHanaProvider'
 import (
-	_ "github.com/go-spatial/tegola/provider/hana"
+	_ "github.com/sobo-gen3v1/soboweb-tegola-cr/provider/hana"
 )

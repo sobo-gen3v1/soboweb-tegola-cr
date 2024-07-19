@@ -1,8 +1,8 @@
 package observability
 
 import (
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/observer"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/observer"
 )
 
 var NullObserver observer.Null

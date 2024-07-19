@@ -10,16 +10,16 @@ import (
 
 	"github.com/go-spatial/geom"
 	"github.com/go-spatial/proj"
-	"github.com/go-spatial/tegola/observability"
-	"github.com/go-spatial/tegola/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/go-spatial/geom/encoding/mvt"
 	"github.com/go-spatial/geom/slippy"
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/internal/log"
-	"github.com/go-spatial/tegola/maths"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
 )
 
 var (

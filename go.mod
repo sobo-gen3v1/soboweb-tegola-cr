@@ -1,4 +1,4 @@
-module github.com/go-spatial/tegola
+module github.com/sobo-gen3v1/soboweb-tegola-cr
 
 go 1.21
 

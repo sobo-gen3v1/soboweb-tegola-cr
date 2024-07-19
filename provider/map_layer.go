@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-spatial/tegola/internal/env"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
 )
 
 // MapLayer represents a the config for a layer in a map

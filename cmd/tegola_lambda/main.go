@@ -10,13 +10,13 @@ import (
 	"github.com/dimfeld/httptreemux"
 
 	"github.com/go-spatial/geom/encoding/mvt"
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/cmd/internal/register"
-	"github.com/go-spatial/tegola/config"
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/build"
-	"github.com/go-spatial/tegola/internal/log"
-	"github.com/go-spatial/tegola/server"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cmd/internal/register"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/config"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/server"
 )
 
 var (

@@ -12,7 +12,7 @@ var (
 	versionFile    = flag.String("version_file", "", "The file that contains the version number")
 	revisionString = flag.String("revision", gitRevision(), "the revision name")
 	branchString   = flag.String("branch", gitBranch(), "the branch name")
-	versionPkg     = flag.String("pkg", "github.com/go-spatial/tegola/internal/build", "the package where the version is set")
+	versionPkg     = flag.String("pkg", "github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build", "the package where the version is set")
 )
 
 func runCmd(cmdName string, parts ...string) ([]byte, error) {

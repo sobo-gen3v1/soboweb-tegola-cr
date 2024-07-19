@@ -10,8 +10,8 @@ import (
 
 	"errors"
 
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/maths/webmercator"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/webmercator"
 )
 
 const (

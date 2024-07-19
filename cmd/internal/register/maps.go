@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/config"
-	"github.com/go-spatial/tegola/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/config"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 func webMercatorMapFromConfigMap(cfg provider.Map) (newMap atlas.Map) {

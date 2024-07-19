@@ -3,7 +3,7 @@ package prometheus
 import (
 	"strings"
 
-	"github.com/go-spatial/tegola/internal/build"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

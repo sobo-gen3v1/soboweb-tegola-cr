@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-spatial/tegola/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
 )
 
 func TestParseKey(t *testing.T) {

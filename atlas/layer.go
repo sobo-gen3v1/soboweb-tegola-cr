@@ -2,9 +2,9 @@ package atlas
 
 import (
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola/internal/env"
-	"github.com/go-spatial/tegola/observability"
-	"github.com/go-spatial/tegola/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 type Layer struct {

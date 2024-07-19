@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-spatial/tegola/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
 )
 
 //Embed UI dist Folder recursively

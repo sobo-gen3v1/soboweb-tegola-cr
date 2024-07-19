@@ -11,9 +11,9 @@ import (
 
 	"github.com/Azure/azure-storage-blob-go/2017-07-29/azblob"
 
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/cache"
-	"github.com/go-spatial/tegola/dict"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
 )
 
 const CacheType = "azblob"

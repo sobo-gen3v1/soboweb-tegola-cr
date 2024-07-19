@@ -3,8 +3,8 @@ package register_test
 import (
 	"testing"
 
-	"github.com/go-spatial/tegola/cmd/internal/register"
-	"github.com/go-spatial/tegola/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cmd/internal/register"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
 )
 
 func TestProviders(t *testing.T) {

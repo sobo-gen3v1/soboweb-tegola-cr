@@ -8,5 +8,5 @@ package atlas
 //
 // go build -tags 'noGpkgProvider'
 import (
-	_ "github.com/go-spatial/tegola/provider/gpkg"
+	_ "github.com/sobo-gen3v1/soboweb-tegola-cr/provider/gpkg"
 )

@@ -8,11 +8,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/ttools"
-	"github.com/go-spatial/tegola/provider"
-	"github.com/go-spatial/tegola/provider/hana"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/ttools"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider/hana"
 )
 
 // TESTENV is the environment variable that must be set to "yes" to run HANA tests.

@@ -7,15 +7,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-spatial/tegola/internal/build"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build"
 	"github.com/prometheus/client_golang/prometheus/push"
 
-	"github.com/go-spatial/tegola/internal/p"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/p"
 
-	tegolaCache "github.com/go-spatial/tegola/cache"
-	"github.com/go-spatial/tegola/dict"
-	"github.com/go-spatial/tegola/internal/log"
-	"github.com/go-spatial/tegola/observability"
+	tegolaCache "github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

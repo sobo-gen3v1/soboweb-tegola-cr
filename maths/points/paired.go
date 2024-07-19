@@ -3,7 +3,7 @@ package points
 import (
 	"fmt"
 
-	"github.com/go-spatial/tegola/maths"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
 )
 
 func Paired(pts []maths.Pt) ([][2]maths.Pt, error) {

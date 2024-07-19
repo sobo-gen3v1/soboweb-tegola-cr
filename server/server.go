@@ -7,14 +7,14 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/go-spatial/tegola/internal/build"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build"
 
-	"github.com/go-spatial/tegola/observability"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
 
 	"github.com/dimfeld/httptreemux"
 
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
 )
 
 const (

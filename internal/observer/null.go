@@ -5,7 +5,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/go-spatial/tegola/cache"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/cache"
 )
 
 type Null struct{}

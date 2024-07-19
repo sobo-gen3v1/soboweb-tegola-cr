@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/dimfeld/httptreemux"
-	"github.com/go-spatial/tegola/observability"
-	"github.com/go-spatial/tegola/ui"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/ui"
 )
 
 // setupViewer in this file is used for registering the viewer routes when the viewer

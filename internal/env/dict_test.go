@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-spatial/tegola/internal/env"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
 )
 
 func TestDict(t *testing.T) {

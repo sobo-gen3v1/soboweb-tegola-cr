@@ -44,7 +44,7 @@ func ToSnakeCase(str string) string {
 var (
 	fset         = token.NewFileSet()
 	TagVar       = flag.String("var", "Tags", "The name of the variable to append tags to.")
-	PackageName  = flag.String("package", "github.com/go-spatial/tegola/internal/build", "The package the name to build the file for.")
+	PackageName  = flag.String("package", "github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build", "The package the name to build the file for.")
 	KeepOldFiles = flag.Bool("keepFiles", false, "Don't remove the old `generate.go` files.")
 	RunCommand   = flag.String("runCommand", "", "The text for the command used to generate files; will default to name of command with args")
 	SrcDir       = flag.String("source", "", "This is the source directory, if not given assume the first argument to be the source, or '.'")

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/gdey/tbltest"
-	"github.com/go-spatial/tegola"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
 )
 
 func TestTileNum2Deg(t *testing.T) {

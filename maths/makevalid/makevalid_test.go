@@ -11,9 +11,9 @@ import (
 
 	"github.com/gdey/tbltest"
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola/draw/svg"
-	"github.com/go-spatial/tegola/maths"
-	"github.com/go-spatial/tegola/maths/hitmap"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/draw/svg"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/maths/hitmap"
 	"github.com/go-test/deep"
 )
 

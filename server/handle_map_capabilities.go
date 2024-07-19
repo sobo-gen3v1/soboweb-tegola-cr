@@ -9,9 +9,9 @@ import (
 	"github.com/dimfeld/httptreemux"
 
 	"github.com/go-spatial/geom"
-	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/internal/log"
-	"github.com/go-spatial/tegola/mapbox/tilejson"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/atlas"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/mapbox/tilejson"
 )
 
 type HandleMapCapabilities struct {

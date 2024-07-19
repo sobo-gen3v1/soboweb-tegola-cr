@@ -5,10 +5,10 @@ import (
 
 	"context"
 
-	"github.com/go-spatial/tegola"
-	"github.com/go-spatial/tegola/internal/ttools"
-	"github.com/go-spatial/tegola/provider"
-	"github.com/go-spatial/tegola/provider/postgis"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/ttools"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider/postgis"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 

@@ -1,0 +1,4 @@
+INSERT INTO public.c_areas (ogc_fid,properties,other_tags,created_at,updated_at,deleted_at) VALUES
+	 (553,NULL,NULL,'2024-07-02 17:01:00+08','2024-07-15 11:40:11.965183+08',NULL),
+	 (554,NULL,NULL,'2024-07-02 17:00:00+08','2024-07-15 11:39:45.882705+08',NULL),
+	 (554,NULL,NULL,'2024-07-02 17:02:00+08','2024-07-15 14:26:35.887025+08',NULL);

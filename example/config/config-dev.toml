@@ -1,0 +1,79 @@
+[webserver]
+port = ":8181"
+
+[webserver.headers]
+Cache-Control = "s-maxage=3600"
+# Access-Control-Allow-Origin = "*"
+# Access-Control-Allow-Methods = "GET, OPTIONS"
+
+[cache]
+type = "redis"
+# `network` (string): [Optional] Network type, either `tcp` or `unix`. Defaults to 'tcp'.
+# `address` (string): [Optional] the address of the Redis instance in form of `ip:port`. Defaults to '127.0.0.1:6379'.
+address = "${REDIS_HOST}"
+# `password` (string): [Optional] password for the Redis instance. Defaults to '' (no password).
+password = ""
+# `ttl` (int): [Optional] the key ttl time in seconds. Defaults to 0 (the key has no expiration time).
+ttl = 0
+# `max_zoom` (int): [Optional] the max zoom the cache should cache to. After this zoom, Set() calls will return before doing work.
+max_zoom = 30
+# `ssl` (bool): [Optional] encrypt connection to the Redis server. Defaults to false (no SSL/TLS)
+# ssl = "${TEGOLA_REDIS_SSL}"
+# `db` (int): [Optional] the database within the Redis instance to cache to.
+db = 1
+
+[[providers]]
+# `name` (string): [Required] provider name is referenced from map layers.
+name = "sobo"
+# `type` (string): [Required] the type of data provider. must be "postgis" to use this data provider
+type = "mvt_postgis" # mvt_postgis
+# `uri` (string): [Required] PostGIS database uri (postgres://user:password@host:port/database)
+uri = "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${TEGOLA_POSTGIS_SSL}" 
+# `srid` (int): [Optional] the SRID of the layer. Supports `3857` (WebMercator) or `4326` (WGS84)
+srid = 4326             
+
+  # spectee data
+  [[providers.layers]]
+  name = "areas_point"
+  geometry_fieldname = "wkb_geometry"
+  geometry_type= "point"
+  id_fieldname = "ogc_fid"
+  sql = "SELECT ST_AsMVTGeom(res.wkb_geometry, !BBOX!) AS wkb_geometry, res.ogc_fid, res.area_code, res.properties FROM {#d_areas} as res WHERE wkb_geometry && !BBOX! AND geometric_type = 'Point'"
+
+  # area data
+  [[providers.layers]]
+  name = "areas_polygon"
+  geometry_fieldname = "wkb_geometry"
+  geometry_type= "polygon"
+  id_fieldname = "ogc_fid"
+  sql = "SELECT ST_AsMVTGeom(res.wkb_geometry, !BBOX!) AS wkb_geometry, res.ogc_fid, res.area_code, res.properties, res.ext_properties FROM {#c_areas} as res WHERE wkb_geometry && !BBOX! AND geometric_type = 'Polygon'"
+     
+  # open street map data of japan
+  # [[providers.layers]]
+  # name = "areas_linestring"
+  # geometry_fieldname = "geom_way"
+  # geometry_type= "linestring"
+  # id_fieldname = "id"
+  # sql = "SELECT ST_AsMVTGeom(geom_way, !BBOX!) AS geom_way, id, osm_id, osm_meta, osm_source_id, osm_target_id, clazz, flags, source, target,km, kmh, cost, reverse_cost,x1,x2,y1,y2  FROM ja_2po_4pgr WHERE geom_way && !BBOX!"
+
+[[maps]]
+name = "sobo"
+# set the center of the map so the user is auto navigated to Sobo
+# [longitude, latitude, zoom_level]
+# [x, y, zoom]
+center = [139.65031060, 35.67619190, 11.0]
+
+  [[maps.layers]]
+  provider_layer = "sobo.areas_point"
+  min_zoom = 5
+  max_zoom = 20
+
+  [[maps.layers]]
+  provider_layer = "sobo.areas_polygon"
+  min_zoom = 5
+  max_zoom = 20
+
+  # [[maps.layers]]
+  # provider_layer = "sobo.areas_linestring"
+  # min_zoom = 5
+  # max_zoom = 20

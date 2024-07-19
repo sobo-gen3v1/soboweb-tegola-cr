@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:latest
+    container_name: tegola-redis
+    ports:
+      - 6379:6379
+
+  database:
+    image: postgis/postgis:13-3.1-alpine
+    container_name: postgis
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sobo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sobo
+    ports:
+      - 5432:5432
+
+  migration:
+    image: postgis/postgis:13-3.1-alpine
+    container_name: migration
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./data:/data
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    command:
+      - /bin/bash
+      - -c
+      - |
+        tar -xzf /data/map-schemas.tar.gz -C /data
+        bash /data/init.sh
+

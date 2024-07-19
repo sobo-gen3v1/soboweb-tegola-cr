@@ -1,0 +1,127 @@
+[webserver]
+port = ":8181"
+
+[webserver.headers]
+Cache-Control = "s-maxage=3600"
+# Access-Control-Allow-Origin = "*"
+# Access-Control-Allow-Methods = "GET, OPTIONS"
+
+[cache]
+type = "redis"
+# `network` (string): [Optional] Network type, either `tcp` or `unix`. Defaults to 'tcp'.
+# `address` (string): [Optional] the address of the Redis instance in form of `ip:port`. Defaults to '127.0.0.1:6379'.
+address = "${REDIS_HOST}"
+# `password` (string): [Optional] password for the Redis instance. Defaults to '' (no password).
+password = "${REDIS_PASSWORD}"
+# `ttl` (int): [Optional] the key ttl time in seconds. Defaults to 0 (the key has no expiration time).
+ttl = 10
+# `max_zoom` (int): [Optional] the max zoom the cache should cache to. After this zoom, Set() calls will return before doing work.
+max_zoom = 18
+# `ssl` (bool): [Optional] encrypt connection to the Redis server. Defaults to false (no SSL/TLS)
+ssl = "${TEGOLA_REDIS_SSL}"
+# `db` (int): [Optional] the database within the Redis instance to cache to.
+db = 1
+
+[[providers]]
+# `name` (string): [Required] provider name is referenced from map layers.
+name = "sobo"
+# `type` (string): [Required] the type of data provider. must be "postgis" to use this data provider
+type = "mvt_postgis"
+# type = "postgis"
+# `uri` (string): [Required] PostGIS database uri (postgres://user:password@host:port/database)
+uri = "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${TEGOLA_POSTGIS_SSL}" 
+# `srid` (int): [Optional] the SRID of the layer. Supports `3857` (WebMercator) or `4326` (WGS84)
+srid = 4326             
+
+  # [[providers.layers]]
+  # # `name` (string): [Required] the name of the layer. This is used to reference this layer from map layers
+  # name = "" 
+  # # `geometry_fieldname` (string): [Optional] the name of the filed which contains the geometry for the feature. defaults to `geom`
+  # geometry_fieldname = ""
+  # # `id_fieldname` (string): [Optional] the name of the feature id field. defaults to `gid`
+  # id_fieldname = ""
+  # # `geometry_type` (string): [Optional] the layer geometry type. If not set, the table will be inspected at startup to try and infer the gemetry type. Valid values are: `Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`, `MultiPolygon`, `GeometryCollection`
+  # geometry_type = ""
+  # # `srid` (int): [Optional] the SRID of the layer. Supports `3857` (WebMercator) or `4326` (WGS84)
+  # srid = 4326
+  # # `sql` (string): [Required] custom SQL to use use. Supports the following tokens:
+  # #   -   `!BBOX!` - [Required] will be replaced with the bounding box of the tile before the query is sent to the database. `!bbox!` and`!BOX!` are supported as well for compatibilitiy with queries from Mapnik and MapServer styles.
+  # #   -   `!X!` - [Optional] will replaced with the "X" value of the requested tile.
+  # #   -   `!Y!` - [Optional] will replaced with the "Y" value of the requested tile.
+  # #   -   `!Z!` - [Optional] will replaced with the "Z" value of the requested tile.
+  # #   -   `!ZOOM!` - [Optional] will be replaced with the "Z" (zoom) value of the requested tile.
+  # #   -   `!SCALE_DENOMINATOR!` - [Optional] scale denominator, assuming 90.7 DPI (i.e. 0.28mm pixel size)
+  # #   -   `!PIXEL_WIDTH!` - [Optional] the pixel width in meters, assuming 256x256 tiles
+  # #   -   `!PIXEL_HEIGHT!` - [Optional] the pixel height in meters, assuming 256x256 tiles
+  # #   -   `!ID_FIELD!` - [Optional] the id field name
+  # #   -   `!GEOM_FIELD!` - [Optional] the geom field name
+  # #   -   `!GEOM_TYPE!` - [Optional] the geom type if defined otherwise ""
+  # sql = ""
+
+
+  [[providers.layers]]
+  name = "areas_linestring"
+  geometry_fieldname = "wkb_geometry"
+  geometry_type= "linestring"
+  id_fieldname = "ogc_fid"
+  # example: use `hstore_column->key as key` to extract those attributes you need
+  # sql = "SELECT ST_AsMVTGeom(wkb_geometry, !BBOX!) AS wkb_geometry, ogc_fid, area_code, other_tags::hstore FROM d_areas WHERE wkb_geometry && !BBOX! !AREA_CODE! !START_TIME! !END_TIME! !DELETED! AND geometric_type = 'Linestring'"
+  # sql = "SELECT ST_AsBinary(wkb_geometry) AS wkb_geometry, ogc_fid, area_code, properties, other_tags FROM d_areas WHERE wkb_geometry && !BBOX! !AREA_CODE! !START_TIME! !END_TIME! !DELETED! AND geometric_type = 'Linestring'"
+  sql = "SELECT ST_AsMVTGeom(res.wkb_geometry, !BBOX!) AS wkb_geometry, res.ogc_fid, res.area_code, res.properties, res.ext_properties FROM {} as res WHERE wkb_geometry && !BBOX! AND geometric_type = 'Linestring'"
+  
+[[maps]]
+name = "sobo"
+# set the center of the map so the user is auto navigated to Sobo
+# [longitude, latitude, zoom_level]
+# [x, y, zoom]
+center = [139.65031060, 35.67619190, 11.0]
+
+  [[maps.layers]]
+  provider_layer = "sobo.areas_linestring"
+  min_zoom = 5
+  max_zoom = 20
+
+
+  # [[maps.params]]
+  # name          = "area_code"         # name used in the URL
+  # token         = "!AREA_CODE!"       # token to replace in providers.layers.sql query
+  # type          = "string"        # one of: int, float, string, bool
+  # sql           = "AND area_code = ?" # SQL to replace the token in the query. ? will be replaced with a parameter value. If omitted, defaults to "?"
+  # # if neither default_value nor default_sql is specified, the URL parameter is required to be present in all queries
+  # # either
+  # # default_value = ""         # if parameter is not specified, this value will be passed to .sql parameter
+  # # or
+  # default_sql   = " " 
+
+  # [[maps.params]]
+  # name          = "start_time"         # name used in the URL
+  # token         = "!START_TIME!"       # token to replace in providers.layers.sql query
+  # type          = "string"        # one of: int, float, string, bool
+  # sql           = "AND created_at > ?" # SQL to replace the token in the query. ? will be replaced with a parameter value. If omitted, defaults to "?"
+  # # if neither default_value nor default_sql is specified, the URL parameter is required to be present in all queries
+  # # either
+  # # default_value = "1970-01-01T00:00:00Z"         # if parameter is not specified, this value will be passed to .sql parameter
+  # # or
+  # default_sql   = " " 
+
+  # [[maps.params]]
+  # name          = "end_time"         # name used in the URL
+  # token         = "!END_TIME!"       # token to replace in providers.layers.sql query
+  # type          = "string"        # one of: int, float, string, bool
+  # sql           = "AND created_at < ?" # SQL to replace the token in the query. ? will be replaced with a parameter value. If omitted, defaults to "?"
+  # # if neither default_value nor default_sql is specified, the URL parameter is required to be present in all queries
+  # # either
+  # # default_value = "9999-12-31T23:59:59Z"         # if parameter is not specified, this value will be passed to .sql parameter
+  # # or
+  # default_sql   = " " 
+
+  # [[maps.params]]
+  # name          = "deleted_at"         # name used in the URL
+  # token         = "!DELETED!"       # token to replace in providers.layers.sql query
+  # type          = "string"        # one of: int, float, string, bool
+  # # sql           = "AND deleted_at = ?" # SQL to replace the token in the query. ? will be replaced with a parameter value. If omitted, defaults to "?"
+  # # if neither default_value nor default_sql is specified, the URL parameter is required to be present in all queries
+  # # either
+  # # default_value = "9999-12-31T23:59:59Z"         # if parameter is not specified, this value will be passed to .sql parameter
+  # # or
+  # default_sql   = "AND deleted_at is null" 

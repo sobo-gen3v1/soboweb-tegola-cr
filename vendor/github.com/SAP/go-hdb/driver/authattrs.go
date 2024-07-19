@@ -1,36 +1,76 @@
 package driver
 
 import (
+	"os"
+	"path"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	p "github.com/SAP/go-hdb/driver/internal/protocol"
-	"github.com/SAP/go-hdb/driver/internal/protocol/x509"
+	"github.com/SAP/go-hdb/driver/internal/protocol/auth"
 )
+
+type certKeyFiles struct {
+	certFile, keyFile string
+}
+
+func newCertKeyFiles(certFile, keyFile string) *certKeyFiles {
+	return &certKeyFiles{certFile: path.Clean(certFile), keyFile: path.Clean(keyFile)}
+}
+
+func (f *certKeyFiles) read() ([]byte, []byte, error) {
+	cert, err := os.ReadFile(f.certFile)
+	if err != nil {
+		return nil, nil, err
+	}
+	key, err := os.ReadFile(f.keyFile)
+	if err != nil {
+		return nil, nil, err
+	}
+	return cert, key, nil
+}
 
 // authAttrs is holding authentication relevant attributes.
 type authAttrs struct {
-	hasCookie            atomicBool
+	hasCookie            atomic.Bool
+	version              atomic.Uint64 // auth attributes version
 	mu                   sync.RWMutex
-	_username, _password string        // basic authentication
-	_certKey             *x509.CertKey // X509
+	_username, _password string // basic authentication
+	_certKeyFiles        *certKeyFiles
+	_certKey             *auth.CertKey // X509
 	_token               string        // JWT
 	_logonname           string        // session cookie login does need logon name provided by JWT authentication.
 	_sessionCookie       []byte        // authentication via session cookie (HDB currently does support only SAML and JWT - go-hdb JWT)
 	_refreshPassword     func() (password string, ok bool)
 	_refreshClientCert   func() (clientCert, clientKey []byte, ok bool)
 	_refreshToken        func() (token string, ok bool)
-	cbmu                 sync.RWMutex // prevents refresh callbacks from being called in parallel
+	cbmu                 sync.Mutex // prevents refresh callbacks from being called in parallel
 }
+
+func isJWTToken(token string) bool { return strings.HasPrefix(token, "ey") }
 
 /*
 	keep c as the instance name, so that the generated help does have
 	the same instance variable name when included in connector
 */
 
-func isJWTToken(token string) bool { return strings.HasPrefix(token, "ey") }
+func (c *authAttrs) clone() *authAttrs {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
-func (c *authAttrs) cookieAuth() *p.Auth {
+	return &authAttrs{
+		_username:          c._username,
+		_password:          c._password,
+		_certKey:           c._certKey,
+		_token:             c._token,
+		_refreshPassword:   c._refreshPassword,
+		_refreshClientCert: c._refreshClientCert,
+		_refreshToken:      c._refreshToken,
+	}
+}
+
+func (c *authAttrs) cookieAuth() *p.AuthHnd {
 	if !c.hasCookie.Load() { // fastpath without lock
 		return nil
 	}
@@ -38,105 +78,98 @@ func (c *authAttrs) cookieAuth() *p.Auth {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	auth := p.NewAuth(c._logonname)                                 // important: for session cookie auth we do need the logonname from JWT auth,
+	auth := p.NewAuthHnd(c._logonname)                              // important: for session cookie auth we do need the logonname from JWT auth,
 	auth.AddSessionCookie(c._sessionCookie, c._logonname, clientID) // and for HANA onPrem the final session cookie req needs the logonname as well.
 	return auth
 }
 
-func (c *authAttrs) auth() *p.Auth {
+func (c *authAttrs) authHnd() *p.AuthHnd {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	auth := p.NewAuth(c._username) // use username as logonname
+	authHnd := p.NewAuthHnd(c._username) // use username as logonname
 	if c._certKey != nil {
-		auth.AddX509(c._certKey)
+		authHnd.AddX509(c._certKey)
 	}
 	if c._token != "" {
-		auth.AddJWT(c._token)
+		authHnd.AddJWT(c._token)
 	}
 	// mimic standard drivers and use password as token if user is empty
 	if c._token == "" && c._username == "" && isJWTToken(c._password) {
-		auth.AddJWT(c._password)
+		authHnd.AddJWT(c._password)
 	}
 	if c._password != "" {
-		auth.AddBasic(c._username, c._password)
+		authHnd.AddBasic(c._username, c._password)
 	}
-	return auth
+	return authHnd
 }
 
-func (c *authAttrs) refreshPassword(passwordSetter p.AuthPasswordSetter) (bool, error) {
-	refreshPassword := c.RefreshPassword()
-	if refreshPassword == nil {
-		return false, nil
-	}
-	c.cbmu.Lock()
-	defer c.cbmu.Unlock()
-	if password, ok := c._refreshPassword(); ok {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if password != c._password {
-			c._password = password
-			passwordSetter.SetPassword(password)
-			return true, nil
-		}
-	}
-	return false, nil
+func (c *authAttrs) callRefreshPasswordWithLock(refreshPassword func() (string, bool)) (string, bool) {
+	defer c.mu.Lock() // finally lock attr again
+	c.mu.Unlock()     // unlock attr, so that callback can call attr methods
+	return refreshPassword()
 }
 
-func (c *authAttrs) refreshToken(tokenSetter p.AuthTokenSetter) (bool, error) {
-	refreshToken := c.RefreshToken()
-	if refreshToken == nil {
-		return false, nil
-	}
-	c.cbmu.Lock()
-	defer c.cbmu.Unlock()
-	if token, ok := c._refreshToken(); ok {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if token != c._token {
-			c._token = token
-			tokenSetter.SetToken(token)
-			return true, nil
-		}
-	}
-	return false, nil
+func (c *authAttrs) callRefreshTokenWithLock(refreshToken func() (token string, ok bool)) (string, bool) {
+	defer c.mu.Lock() // finally lock attr again
+	c.mu.Unlock()     // unlock attr, so that callback can call attr methods
+	return refreshToken()
 }
 
-func (c *authAttrs) refreshCertKey(certKeySetter p.AuthCertKeySetter) (bool, error) {
-	refreshClientCert := c.RefreshClientCert()
-	if refreshClientCert == nil {
-		return false, nil
-	}
-	c.cbmu.Lock()
+func (c *authAttrs) callRefreshClientCertWithLock(refreshClientCert func() (clientCert, clientKey []byte, ok bool)) ([]byte, []byte, bool) {
+	defer c.mu.Lock() // finally lock attr again
+	c.mu.Unlock()     // unlock attr, so that callback can call attr methods
+	return refreshClientCert()
+}
+
+func (c *authAttrs) refresh() error {
+	c.cbmu.Lock() // synchronize refresh calls
 	defer c.cbmu.Unlock()
-	if clientCert, clientKey, ok := c._refreshClientCert(); ok {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if !c._certKey.Equal(clientCert, clientKey) {
-			certKey, err := x509.NewCertKey(clientCert, clientKey)
-			if err != nil {
-				return false, err
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c._refreshPassword != nil {
+		if password, ok := c.callRefreshPasswordWithLock(c._refreshPassword); ok {
+			if password != c._password {
+				c._password = password
+				c.version.Add(1)
 			}
-			c._certKey = certKey
-			certKeySetter.SetCertKey(certKey)
-			return true, nil
 		}
 	}
-	return false, nil
-}
-
-func (c *authAttrs) refresh(auth *p.Auth) (bool, error) {
-	switch method := auth.Method().(type) {
-
-	case p.AuthPasswordSetter:
-		return c.refreshPassword(method)
-	case p.AuthTokenSetter:
-		return c.refreshToken(method)
-	case p.AuthCertKeySetter:
-		return c.refreshCertKey(method)
-	default:
-		return false, nil
+	if c._refreshToken != nil {
+		if token, ok := c.callRefreshTokenWithLock(c._refreshToken); ok {
+			if token != c._token {
+				c._token = token
+				c.version.Add(1)
+			}
+		}
 	}
+	switch {
+	case c._certKeyFiles != nil && c._refreshClientCert == nil:
+		if clientCert, clientKey, err := c._certKeyFiles.read(); err != nil {
+			if c._certKey == nil || !c._certKey.Equal(clientCert, clientKey) {
+				certKey, err := auth.NewCertKey(clientCert, clientKey)
+				if err != nil {
+					return err
+				}
+				c._certKey = certKey
+				c.version.Add(1)
+			}
+		}
+	case c._refreshClientCert != nil:
+		if clientCert, clientKey, ok := c.callRefreshClientCertWithLock(c._refreshClientCert); ok {
+			if c._certKey == nil || !c._certKey.Equal(clientCert, clientKey) {
+				certKey, err := auth.NewCertKey(clientCert, clientKey)
+				if err != nil {
+					return err
+				}
+				c._certKey = certKey
+				c.version.Add(1)
+			}
+		}
+	}
+	return nil
 }
 
 func (c *authAttrs) invalidateCookie() { c.hasCookie.Store(false) }

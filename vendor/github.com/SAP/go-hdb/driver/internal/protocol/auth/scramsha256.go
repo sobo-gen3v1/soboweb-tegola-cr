@@ -3,15 +3,27 @@ package auth
 // Salted Challenge Response Authentication Mechanism (SCRAM)
 
 import (
+	"bytes"
 	"fmt"
+
+	"github.com/SAP/go-hdb/driver/internal/protocol/cache"
 )
+
+func scramsha256Key(password, salt []byte) []byte {
+	return _sha256(_hmac(password, salt))
+}
+
+// use cache as key calculation is expensive.
+var scramKeyCache = cache.NewList(3, func(k *SCRAMSHA256) []byte {
+	return scramsha256Key([]byte(k.password), k.salt)
+})
 
 // SCRAMSHA256 implements SCRAMSHA256 authentication.
 type SCRAMSHA256 struct {
-	username, password       string
-	clientChallenge          []byte
-	salt, serverChallenge    []byte
-	clientProof, serverProof []byte
+	username, password    string
+	clientChallenge       []byte
+	salt, serverChallenge []byte
+	serverProof           []byte
 }
 
 // NewSCRAMSHA256 creates a new authSCRAMSHA256 instance.
@@ -23,13 +35,15 @@ func (a *SCRAMSHA256) String() string {
 	return fmt.Sprintf("method type %s clientChallenge %v", a.Typ(), a.clientChallenge)
 }
 
-// SetPassword implemets the AuthPasswordSetter interface.
-func (a *SCRAMSHA256) SetPassword(password string) { a.password = password }
+// Compare implements cache.Compare interface.
+func (a *SCRAMSHA256) Compare(a1 *SCRAMSHA256) bool {
+	return a.password == a1.password && bytes.Equal(a.salt, a1.salt)
+}
 
-// Typ implements the CookieGetter interface.
+// Typ implements the Method interface.
 func (a *SCRAMSHA256) Typ() string { return MtSCRAMSHA256 }
 
-// Order implements the CookieGetter interface.
+// Order implements the Method interface.
 func (a *SCRAMSHA256) Order() byte { return MoSCRAMSHA256 }
 
 // PrepareInitReq implements the Method interface.
@@ -58,16 +72,16 @@ func (a *SCRAMSHA256) InitRepDecode(d *Decoder) error {
 
 // PrepareFinalReq implements the Method interface.
 func (a *SCRAMSHA256) PrepareFinalReq(prms *Prms) error {
-	key := scramsha256Key([]byte(a.password), a.salt)
-	a.clientProof = clientProof(key, a.salt, a.serverChallenge, a.clientChallenge)
-	if err := checkClientProof(a.clientProof); err != nil {
+	key := scramKeyCache.Get(a)
+	clientProof, err := clientProof(key, a.salt, a.serverChallenge, a.clientChallenge)
+	if err != nil {
 		return err
 	}
 
 	prms.AddCESU8String(a.username)
 	prms.addString(a.Typ())
 	subPrms := prms.addPrms()
-	subPrms.addBytes(a.clientProof)
+	subPrms.addBytes(clientProof)
 
 	return nil
 }
@@ -89,8 +103,4 @@ func (a *SCRAMSHA256) FinalRepDecode(d *Decoder) error {
 	}
 	a.serverProof = d.bytes()
 	return nil
-}
-
-func scramsha256Key(password, salt []byte) []byte {
-	return _sha256(_hmac(password, salt))
 }

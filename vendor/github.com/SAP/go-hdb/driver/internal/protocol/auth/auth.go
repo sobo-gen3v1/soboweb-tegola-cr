@@ -2,18 +2,21 @@
 package auth
 
 import (
+	"cmp"
 	"encoding/binary"
 	"fmt"
 	"math"
+	"slices"
 
 	"github.com/SAP/go-hdb/driver/internal/protocol/encoding"
-	"github.com/SAP/go-hdb/driver/unicode/cesu8"
 )
 
-// authentication method types supported by the driver:
-// - basic authentication (username, password based) (whether SCRAMSHA256 or SCRAMPBKDF2SHA256) and
-// - X509 (client certificate) authentication and
-// - JWT (token) authentication
+/*
+authentication method types supported by the driver:
+  - basic authentication (username, password based) (whether SCRAMSHA256 or SCRAMPBKDF2SHA256) and
+  - X509 (client certificate) authentication and
+  - JWT (token) authentication
+*/
 const (
 	MtSCRAMSHA256       = "SCRAMSHA256"       // password
 	MtSCRAMPBKDF2SHA256 = "SCRAMPBKDF2SHA256" // password pbkdf2
@@ -40,6 +43,24 @@ type Method interface {
 	InitRepDecode(d *Decoder) error
 	PrepareFinalReq(prms *Prms) error
 	FinalRepDecode(d *Decoder) error
+}
+
+// Methods defines a collection of methods.
+type Methods map[string]Method // key equals authentication method type.
+
+// Order returns an ordered method slice.
+func (m Methods) Order() []Method {
+	methods := make([]Method, 0, len(m))
+	for _, e := range m {
+		methods = append(methods, e)
+	}
+	slices.SortFunc(methods, func(m1, m2 Method) int { return cmp.Compare(m1.Order(), m2.Order()) })
+	return methods
+}
+
+// CookieGetter is implemented by authentication methods supporting cookies to reconnect.
+type CookieGetter interface {
+	Cookie() (logonname string, cookie []byte)
 }
 
 var (
@@ -91,7 +112,7 @@ func (s *subPrmsSize) decode(d *encoding.Decoder) {
 	case b == subPrmsSize2ByteIndicator:
 		*s = subPrmsSize(d.Uint16ByteOrder(binary.BigEndian))
 	default:
-		panic(fmt.Sprintf("invalid sub parameter size indicator %d", b))
+		panic("invalid sub parameter size indicator")
 	}
 }
 
@@ -135,7 +156,7 @@ type Prms struct {
 	prms []any
 }
 
-func (p *Prms) String() string { return fmt.Sprintf("%v", []any(p.prms)) }
+func (p *Prms) String() string { return fmt.Sprintf("%v", p.prms) }
 
 // AddCESU8String adds a CESU8 string parameter.
 func (p *Prms) AddCESU8String(s string) { p.prms = append(p.prms, s) } // unicode string
@@ -153,15 +174,13 @@ func (p *Prms) Size() int {
 	size := encoding.SmallintFieldSize // no of parameters (2 bytes)
 	for _, e := range p.prms {
 		switch e := e.(type) {
-		case []byte:
-			size += encoding.VarFieldSize(len(e))
-		case string:
-			size += encoding.VarFieldSize(cesu8.StringSize(e))
+		case []byte, string:
+			size += encoding.VarFieldSize(e)
 		case *Prms:
 			subSize := subPrmsSize(e.Size())
 			size += (int(subSize) + subSize.fieldSize())
 		default:
-			panic(fmt.Sprintf("invalid parameter %[1]v %[1]t", e)) // should not happen
+			panic("invalid parameter") // should not happen
 		}
 	}
 	return size
@@ -194,8 +213,17 @@ func (p *Prms) Encode(enc *encoding.Encoder) error {
 				return err
 			}
 		default:
-			panic(fmt.Sprintf("invalid parameter %[1]v %[1]t", e)) // should not happen
+			panic("invalid parameter") // should not happen
 		}
+	}
+	return nil
+}
+
+// Decode decodes the parameters.
+func (p *Prms) Decode(dec *encoding.Decoder) error {
+	numPrms := int(dec.Int16())
+	for i := 0; i < numPrms; i++ {
+
 	}
 	return nil
 }

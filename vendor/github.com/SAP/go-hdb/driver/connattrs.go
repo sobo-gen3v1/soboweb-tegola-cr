@@ -4,14 +4,17 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"log/slog"
+	"maps"
+	"math"
 	"os"
+	"path"
 	"sync"
 	"time"
 
 	"github.com/SAP/go-hdb/driver/dial"
 	p "github.com/SAP/go-hdb/driver/internal/protocol"
 	"github.com/SAP/go-hdb/driver/unicode/cesu8"
-	"golang.org/x/exp/maps"
 	"golang.org/x/text/transform"
 )
 
@@ -38,21 +41,19 @@ const (
 
 const (
 	defaultFetchSize    = 128         // Default value fetchSize.
-	defaultLobChunkSize = 8192        // Default value lobChunkSize.
+	defaultLobChunkSize = 1 << 16     // Default value lobChunkSize.
 	defaultDfv          = p.DfvLevel8 // Default data version format level.
-	defaultLegacy       = false       // Default value legacy.
 )
 
 const (
-	minFetchSize    = 1       // Minimal fetchSize value.
-	minLobChunkSize = 128     // Minimal lobChunkSize
-	maxLobChunkSize = 1 << 14 // Maximal lobChunkSize (TODO check)
+	minFetchSize    = 1             // Minimal fetchSize value.
+	minLobChunkSize = 128           // Minimal lobChunkSize
+	maxLobChunkSize = math.MaxInt32 // Maximal lobChunkSize
 )
 
 // connAttrs is holding connection relevant attributes.
 type connAttrs struct {
 	mu                sync.RWMutex
-	_host             string
 	_timeout          time.Duration
 	_pingInterval     time.Duration
 	_bufferSize       int
@@ -67,9 +68,10 @@ type connAttrs struct {
 	_fetchSize        int
 	_lobChunkSize     int
 	_dfv              int
-	_legacy           bool
 	_cesu8Decoder     func() transform.Transformer
 	_cesu8Encoder     func() transform.Transformer
+	_emptyDateAsNull  bool
+	_logger           *slog.Logger
 }
 
 func newConnAttrs() *connAttrs {
@@ -83,9 +85,9 @@ func newConnAttrs() *connAttrs {
 		_fetchSize:       defaultFetchSize,
 		_lobChunkSize:    defaultLobChunkSize,
 		_dfv:             defaultDfv,
-		_legacy:          defaultLegacy,
 		_cesu8Decoder:    cesu8.DefaultDecoder,
 		_cesu8Encoder:    cesu8.DefaultEncoder,
+		_logger:          slog.Default(),
 	}
 }
 
@@ -99,7 +101,6 @@ func (c *connAttrs) clone() *connAttrs {
 	defer c.mu.RUnlock()
 
 	return &connAttrs{
-		_host:             c._host,
 		_timeout:          c._timeout,
 		_pingInterval:     c._pingInterval,
 		_bufferSize:       c._bufferSize,
@@ -114,9 +115,10 @@ func (c *connAttrs) clone() *connAttrs {
 		_fetchSize:        c._fetchSize,
 		_lobChunkSize:     c._lobChunkSize,
 		_dfv:              c._dfv,
-		_legacy:           c._legacy,
 		_cesu8Decoder:     c._cesu8Decoder,
 		_cesu8Encoder:     c._cesu8Encoder,
+		_emptyDateAsNull:  c._emptyDateAsNull,
+		_logger:           c._logger,
 	}
 }
 
@@ -138,11 +140,11 @@ func (c *connAttrs) setBulkSize(bulkSize int) {
 func (c *connAttrs) setTLS(serverName string, insecureSkipVerify bool, rootCAFiles []string) error {
 	c._tlsConfig = &tls.Config{
 		ServerName:         serverName,
-		InsecureSkipVerify: insecureSkipVerify,
+		InsecureSkipVerify: insecureSkipVerify, //nolint:gosec
 	}
 	var certPool *x509.CertPool
 	for _, fn := range rootCAFiles {
-		rootPEM, err := os.ReadFile(fn)
+		rootPEM, err := os.ReadFile(path.Clean(fn))
 		if err != nil {
 			return err
 		}
@@ -185,21 +187,6 @@ func (c *connAttrs) setDfv(dfv int) {
 	}
 	c._dfv = dfv
 }
-func (c *connAttrs) setCESU8Decoder(cesu8Decoder func() transform.Transformer) {
-	if cesu8Decoder == nil {
-		cesu8Decoder = cesu8.DefaultDecoder
-	}
-	c._cesu8Decoder = cesu8Decoder
-}
-func (c *connAttrs) setCESU8Encoder(cesu8Encoder func() transform.Transformer) {
-	if cesu8Encoder == nil {
-		cesu8Encoder = cesu8.DefaultEncoder
-	}
-	c._cesu8Encoder = cesu8Encoder
-}
-
-// Host returns the host of the connector.
-func (c *connAttrs) Host() string { c.mu.RLock(); defer c.mu.RUnlock(); return c._host }
 
 // Timeout returns the timeout of the connector.
 func (c *connAttrs) Timeout() time.Duration { c.mu.RLock(); defer c.mu.RUnlock(); return c._timeout }
@@ -225,9 +212,14 @@ func (c *connAttrs) PingInterval() time.Duration {
 /*
 SetPingInterval sets the connection ping interval value of the connector.
 
-If the ping interval is greater than zero, the driver pings all open
-connections (active or idle in connection pool) periodically.
-Parameter d defines the time between the pings in milliseconds.
+Using a ping interval supports detecting broken connections. In case the ping
+is not successful a new or another connection out of the connection pool would
+be used automatically instead of retuning an error.
+
+Parameter d defines the time between the pings as duration.
+If d is zero no ping is executed. If d is not zero a database ping is executed if
+an idle connection out of the connection pool is reused and the time since the
+last connection access is greater or equal than d.
 */
 func (c *connAttrs) SetPingInterval(d time.Duration) {
 	c.mu.Lock()
@@ -320,7 +312,7 @@ func (c *connAttrs) SetDialer(dialer dial.Dialer) {
 	c.setDialer(dialer)
 }
 
-// ApplicationName returns the locale of the connector.
+// ApplicationName returns the application name of the connector.
 func (c *connAttrs) ApplicationName() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -354,7 +346,7 @@ func (c *connAttrs) Locale() string { c.mu.RLock(); defer c.mu.RUnlock(); return
 /*
 SetLocale sets the locale of the connector.
 
-For more information please see DSNLocale.
+For more information please see http://help.sap.com/hana/SAP_HANA_SQL_Command_Network_Protocol_Reference_en.pdf.
 */
 func (c *connAttrs) SetLocale(locale string) { c.mu.Lock(); defer c.mu.Unlock(); c._locale = locale }
 
@@ -388,12 +380,6 @@ func (c *connAttrs) Dfv() int { c.mu.RLock(); defer c.mu.RUnlock(); return c._df
 // SetDfv sets the client data format version of the connector.
 func (c *connAttrs) SetDfv(dfv int) { c.mu.Lock(); defer c.mu.Unlock(); c.setDfv(dfv) }
 
-// Legacy returns the connector legacy flag.
-func (c *connAttrs) Legacy() bool { c.mu.RLock(); defer c.mu.RUnlock(); return c._legacy }
-
-// SetLegacy sets the connector legacy flag.
-func (c *connAttrs) SetLegacy(b bool) { c.mu.Lock(); defer c.mu.Unlock(); c._legacy = b }
-
 // CESU8Decoder returns the CESU-8 decoder of the connector.
 func (c *connAttrs) CESU8Decoder() func() transform.Transformer {
 	c.mu.RLock()
@@ -405,7 +391,10 @@ func (c *connAttrs) CESU8Decoder() func() transform.Transformer {
 func (c *connAttrs) SetCESU8Decoder(cesu8Decoder func() transform.Transformer) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.setCESU8Decoder(cesu8Decoder)
+	if cesu8Decoder == nil {
+		cesu8Decoder = cesu8.DefaultDecoder
+	}
+	c._cesu8Decoder = cesu8Decoder
 }
 
 // CESU8Encoder returns the CESU-8 encoder of the connector.
@@ -419,5 +408,48 @@ func (c *connAttrs) CESU8Encoder() func() transform.Transformer {
 func (c *connAttrs) SetCESU8Encoder(cesu8Encoder func() transform.Transformer) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.setCESU8Encoder(cesu8Encoder)
+	if cesu8Encoder == nil {
+		cesu8Encoder = cesu8.DefaultEncoder
+	}
+	c._cesu8Encoder = cesu8Encoder
+}
+
+/*
+EmptyDateAsNull returns NULL for empty dates ('0000-00-00') if true, otherwise:
+
+For data format version 1 the backend does return the NULL indicator for empty date fields.
+For data format version non equal 1 (field type daydate) the NULL indicator is not set and the return value is 0.
+As value 1 represents '0001-01-01' (the minimal valid date) without setting EmptyDateAsNull '0000-12-31' is returned,
+so that NULL, empty and valid dates can be distinguished.
+
+https://help.sap.com/docs/HANA_SERVICE_CF/7c78579ce9b14a669c1f3295b0d8ca16/3f81ccc7e35d44cbbc595c7d552c202a.html?locale=en-US
+*/
+func (c *connAttrs) EmptyDateAsNull() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c._emptyDateAsNull
+}
+
+// SetEmptyDateAsNull sets the EmptyDateAsNull flag of the connector.
+func (c *connAttrs) SetEmptyDateAsNull(emptyDateAsNull bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c._emptyDateAsNull = emptyDateAsNull
+}
+
+// Logger returns the Logger instance of the connector.
+func (c *connAttrs) Logger() *slog.Logger {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c._logger
+}
+
+// SetLogger sets the Logger instance of the connector.
+func (c *connAttrs) SetLogger(logger *slog.Logger) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if logger == nil {
+		logger = slog.Default()
+	}
+	c._logger = logger
 }

@@ -2,19 +2,20 @@ package postgis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/go-spatial/geom"
+	"github.com/jackc/pgproto3/v2"
+	"github.com/jackc/pgtype"
 	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
 	"github.com/sobo-gen3v1/soboweb-tegola-cr/basic"
 	"github.com/sobo-gen3v1/soboweb-tegola-cr/config"
 	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/env"
 	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
 	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
-	"github.com/jackc/pgproto3/v2"
-	"github.com/jackc/pgtype"
 )
 
 // isMVT will return true if the provider is MVT based
@@ -287,9 +288,43 @@ func decipherFields(ctx context.Context, geomFieldname, idFieldname string, desc
 			switch vex := values[i].(type) {
 			case map[string]pgtype.Text:
 				for k, v := range vex {
-					// we need to check if the key already exists. if it does, then don't overwrite it
-					if _, ok := tags[k]; !ok {
-						tags[k] = v.String
+					// Usage of prerequisite
+					// config.toml
+					//
+					// [[providers]]
+					// # `type` must be "postgis"
+					// type = "postgis"
+					// ...
+					//   [[providers.layers]]
+					//   name = "areas_linestring"
+					//   geometry_fieldname = "wkb_geometry"
+					//   geometry_type= "linestring"
+					//   id_fieldname = "ogc_fid"
+					//   # ST_AsBinary is required
+					//   sql = "SELECT ST_AsBinary(wkb_geometry) AS wkb_geometry, ogc_fid, area_code, properties, other_tags FROM d_areas WHERE wkb_geometry && !BBOX! AND geometric_type = 'Linestring'"
+
+					if strings.EqualFold("properties", k) {
+						var hstore map[string]string
+						if v.String == "" {
+							continue
+						}
+						err := json.Unmarshal([]byte(v.String), &hstore)
+						if err != nil {
+							return 0, nil, nil, err
+						}
+
+						for key, val := range hstore {
+							// we need to check if the key already exists. if it does, then don't overwrite it
+							if _, ok := tags[key]; !ok {
+								tags[key] = val
+							}
+						}
+
+					} else {
+						// we need to check if the key already exists. if it does, then don't overwrite it
+						if _, ok := tags[k]; !ok {
+							tags[k] = v.String
+						}
 					}
 				}
 			case pgtype.Numeric:

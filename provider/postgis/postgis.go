@@ -16,18 +16,18 @@ import (
 
 	"github.com/go-spatial/geom"
 	"github.com/go-spatial/geom/encoding/wkb"
-	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
-	conf "github.com/sobo-gen3v1/soboweb-tegola-cr/config"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 	"github.com/jackc/pgproto3/v2"
 	"github.com/jackc/pgtype"
 	gofrs "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/prometheus/client_golang/prometheus"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	conf "github.com/sobo-gen3v1/soboweb-tegola-cr/config"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 const Name = "postgis"
@@ -934,11 +934,19 @@ func (p Provider) TileFeatures(ctx context.Context, layer string, tile provider.
 	return rows.Err()
 }
 
+// query the information of layers directly, eg. public.`d_areas`
+const QUERY_SQL = `(select cat.ogc_fid, cat.wkb_geometry::geometry, cat."geometric_type", cat.area_code, cat."properties", cat.other_tags, cat.created_at from ( select * from ( select *, ROW_NUMBER() OVER ( PARTITION BY ca.ogc_fid order by ca.created_at desc ) AS rn from {#table} ca, ( select start_time, end_time from public.v_areas where {#condition} ) as va where ca.created_at >= va.start_time and ca.created_at <= va.end_time ) as cas where cas.rn = 1 ) as cat)`
+
+// join the master table to query the information of layers, eg. public.`c_areas`
+const QUERY_SQL_VERSION = `(select ma.ogc_fid, ma.wkb_geometry::geometry, ma."geometric_type", ma.area_code, ma."properties", ma.other_tags, cat."properties" as ext_properties, cat.other_tags as ext_tags, cat.created_at from ( select * from ( select *, ROW_NUMBER() OVER ( PARTITION BY ca.ogc_fid order by ca.created_at desc ) AS rn from {#table} ca, ( select start_time, end_time from public.v_areas where {#condition} ) as va where ca.created_at >= va.start_time and ca.created_at <= va.end_time ) as cas where cas.rn = 1 ) as cat inner join public.m_areas ma on ma.ogc_fid = cat.ogc_fid)`
+
 func (p Provider) MVTForLayers(ctx context.Context, tile provider.Tile, params provider.Params, layers []provider.Layer) ([]byte, error) {
 	var (
-		err     error
-		sqls    = make([]string, 0, len(layers))
-		mapName string
+		err       error
+		sqls      = make([]string, 0, len(layers))
+		mapName   string
+		layerName string
+		version   string
 	)
 
 	{
@@ -946,6 +954,22 @@ func (p Provider) MVTForLayers(ctx context.Context, tile provider.Tile, params p
 		if mapNameVal != nil {
 			// if it's not convertible to a string, we will ignore it.
 			mapName, _ = mapNameVal.(string)
+		}
+	}
+
+	{
+		layerNameVal := ctx.Value(observability.ObserveVarLayerName)
+		if layerNameVal != nil {
+			// if it's not convertible to a string, we will ignore it.
+			layerName, _ = layerNameVal.(string)
+		}
+	}
+
+	{
+		versionVal := ctx.Value(observability.ObserveVarVersion)
+		if versionVal != nil {
+			// if it's not convertible to a string, we will ignore it.
+			version, _ = versionVal.(string)
 		}
 	}
 
@@ -971,6 +995,42 @@ func (p Provider) MVTForLayers(ctx context.Context, tile provider.Tile, params p
 
 		// replace configured query parameters if any
 		sql = params.ReplaceParams(sql, &args)
+
+		tableNameReg := regexp.MustCompile(`\{#.*?\}`)
+		tableNameBytes := tableNameReg.Find([]byte(sql))
+
+		// prepare the statement of sql:
+		// 1. if the sql defined in `config.tom` doesn't contain the mark of `{#table_name}`, then use it directly.
+		// 2. if the sql contains the mark of `{#table_name}`, then extract the name of it
+		//    2.1 if the table_name is `d_areas`, then use the QUERY_SQL(without `join`) to compose the sql statement.
+		//    2.2 if the table_name is `c_areas`, then use the QUERY_SQL_VERSION(with `join m_areas`) to compose the sql statement.
+		if tableNameBytes != nil {
+			tableName := string(tableNameBytes[2 : len(tableNameBytes)-1])
+
+			var condition string
+			if version != "" {
+				condition += fmt.Sprintf(" version = '%s' ", version)
+			}
+			if layerName != "" {
+				condition += fmt.Sprintf(" and layer_name = '%s' ", layerName)
+			}
+
+			var inner_sql string
+			// replace the mark of `{#condition}` to `version = 'v1' and layer_name = 'xxx'`
+			switch tableName {
+			case "d_areas":
+				inner_sql = strings.Replace(QUERY_SQL, "{#condition}", condition, -1)
+			case "c_areas":
+				inner_sql = strings.Replace(QUERY_SQL_VERSION, "{#condition}", condition, -1)
+			default:
+				//todo
+			}
+
+			// replace the target table name
+			inner_sql = strings.Replace(inner_sql, "{#table}", tableName, -1)
+
+			sql = tableNameReg.ReplaceAllString(sql, inner_sql)
+		}
 
 		// ref: https://postgis.net/docs/ST_AsMVT.html
 		// bytea ST_AsMVT(any_element row, text name, integer extent, text geom_name, text feature_id_name)

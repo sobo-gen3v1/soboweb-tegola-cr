@@ -15,6 +15,7 @@ import (
 const (
 	ObserveVarMapName   = ":map_name"
 	ObserveVarLayerName = ":layer_name"
+	ObserveVarVersion   = ":version"
 	ObserveVarTileX     = ":x"
 	ObserveVarTileY     = ":y"
 	ObserveVarTileZ     = ":z"
@@ -182,6 +183,8 @@ func LabelForObserveVar(key string) string {
 		return "map_name"
 	case ObserveVarLayerName:
 		return "layer_name"
+	case ObserveVarVersion:
+		return "version"
 	case ObserveVarTileX:
 		return "x"
 	case ObserveVarTileY:

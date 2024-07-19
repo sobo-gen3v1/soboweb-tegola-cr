@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-spatial/geom"
 	"github.com/go-spatial/proj"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/basic"
 	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
 	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 
@@ -37,6 +38,8 @@ func init() {
 type HandleMapLayerZXY struct {
 	// required
 	mapName string
+	// required
+	version string
 	// optional
 	layerName string
 	// zoom
@@ -62,6 +65,7 @@ func (req *HandleMapLayerZXY) parseURI(r *http.Request) error {
 
 	// set map name
 	req.mapName = params["map_name"]
+	req.version = params["version"]
 	req.layerName = params["layer_name"]
 
 	var placeholder uint64
@@ -201,7 +205,12 @@ func (req HandleMapLayerZXY) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encodeCtx := context.WithValue(r.Context(), observability.ObserveVarMapName, m.Name)
+	ctxVals := make(map[string]any)
+	ctxVals[observability.ObserveVarMapName] = m.Name
+	ctxVals[observability.ObserveVarLayerName] = req.layerName
+	ctxVals[observability.ObserveVarVersion] = req.version
+
+	encodeCtx := basic.ContextWithValues(r.Context(), ctxVals)
 	pbyte, err := m.Encode(encodeCtx, tile, params)
 
 	if err != nil {

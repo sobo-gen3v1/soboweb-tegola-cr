@@ -16,18 +16,18 @@ import (
 
 	"github.com/go-spatial/geom"
 	"github.com/go-spatial/geom/encoding/wkb"
-	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
-	conf "github.com/sobo-gen3v1/soboweb-tegola-cr/config"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
-	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 	"github.com/jackc/pgproto3/v2"
 	"github.com/jackc/pgtype"
 	gofrs "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/prometheus/client_golang/prometheus"
+	tegola "github.com/sobo-gen3v1/soboweb-tegola-cr"
+	conf "github.com/sobo-gen3v1/soboweb-tegola-cr/config"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/dict"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/internal/log"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/observability"
+	"github.com/sobo-gen3v1/soboweb-tegola-cr/provider"
 )
 
 const Name = "postgis"
@@ -690,7 +690,7 @@ func (p Provider) inspectLayerGeomType(pname string, l *Layer, maps []provider.M
 	// we want to know the geom type instead of returning the geom data so we modify the SQL
 	// TODO (arolek): this strategy wont work if remove the requirement of wrapping ST_AsBinary(geom) in the SQL statements.
 	//
-	// https://github.com/go-spatial/tegola/issues/180
+	// https://github.com/sobo-gen3v1/soboweb-tegola-cr/issues/180
 	//
 	// case insensitive search
 

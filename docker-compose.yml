@@ -36,7 +36,7 @@ services:
       - /bin/bash
       - -c
       - |
-        wget "https://github.com/go-spatial/tegola-testdata/raw/master/tegola.dump" 
+        wget "https://github.com/sobo-gen3v1/soboweb-tegola-cr-testdata/raw/master/tegola.dump" 
         psql -h postgis -p 5432 -U postgres -d postgres -c "DROP DATABASE IF EXISTS tegola;"
         pg_restore -h postgis -p 5432 -U postgres -d postgres -C tegola.dump
         psql -h postgis -U postgres -d postgres -c "DROP ROLE IF EXISTS tegola_no_access;CREATE ROLE tegola_no_access LOGIN PASSWORD 'postgres'"

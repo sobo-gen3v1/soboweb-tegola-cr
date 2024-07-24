@@ -1,10 +1,10 @@
 # Tegola
 
-![On push](https://github.com/go-spatial/tegola/workflows/On%20push/badge.svg)
-[![Report Card](https://goreportcard.com/badge/github.com/go-spatial/tegola)](https://goreportcard.com/badge/github.com/go-spatial/tegola)
-[![Coverage Status](https://coveralls.io/repos/github/go-spatial/tegola/badge.svg?branch=master)](https://coveralls.io/github/go-spatial/tegola?branch=master)
-[![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/go-spatial/tegola)
-[![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/go-spatial/tegola/blob/master/LICENSE.md)
+![On push](https://github.com/sobo-gen3v1/soboweb-tegola-cr/workflows/On%20push/badge.svg)
+[![Report Card](https://goreportcard.com/badge/github.com/sobo-gen3v1/soboweb-tegola-cr)](https://goreportcard.com/badge/github.com/sobo-gen3v1/soboweb-tegola-cr)
+[![Coverage Status](https://coveralls.io/repos/github/sobo-gen3v1/soboweb-tegola-cr/badge.svg?branch=master)](https://coveralls.io/github/sobo-gen3v1/soboweb-tegola-cr?branch=master)
+[![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/sobo-gen3v1/soboweb-tegola-cr)
+[![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/sobo-gen3v1/soboweb-tegola-cr/blob/master/LICENSE.md)
 
 Tegola is a vector tile server delivering [Mapbox Vector Tiles](https://github.com/mapbox/vector-tile-spec) with support for [PostGIS](https://postgis.net/), [GeoPackage](https://www.geopackage.org/) and [SAP HANA Spatial](https://www.sap.com/products/technology-platform/hana/what-is-sap-hana.html) data providers. User documentation can be found at [tegola.io](https://tegola.io)
 
@@ -47,7 +47,7 @@ Use "tegola [command] --help" for more information about a command.
 
 ## Running tegola as a vector tile server
 
-1. Download the appropriate binary of tegola for your platform via the [release page](https://github.com/go-spatial/tegola/releases).
+1. Download the appropriate binary of tegola for your platform via the [release page](https://github.com/sobo-gen3v1/soboweb-tegola-cr/releases).
 2. Set up your config file and run. By default, Tegola looks for a `config.toml` in the same directory as the binary. You can set a different location for the `config.toml` using a command flag:
 
 ```
@@ -62,7 +62,7 @@ Use "tegola [command] --help" for more information about a command.
 
 The server root will display the built-in viewer with an automatically generated style. For example:
 
-![tegola built in viewer](https://raw.githubusercontent.com/go-spatial/tegola/v0.4.0/docs/screenshots/built-in-viewer.png "tegola built in viewer")
+![tegola built in viewer](https://raw.githubusercontent.com/sobo-gen3v1/soboweb-tegola-cr/v0.4.0/docs/screenshots/built-in-viewer.png "tegola built in viewer")
 
 ```
 /maps/:map_name/:z/:x/:y
@@ -243,7 +243,7 @@ go build -tags 'noRedisCache noGpkgProvider noViewer'
 
 ```bash
 # first set some env to make it easier to read:
-BUILD_PKG=github.com/go-spatial/tegola/internal/build
+BUILD_PKG=github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build
 VERSION=1.16.x
 GIT_BRANCH=$(git branch --no-color --show-current)
 GIT_REVISION=$(git log HEAD --oneline | head -n 1 | cut -d ' ' -f 1)

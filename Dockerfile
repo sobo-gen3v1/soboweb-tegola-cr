@@ -1,6 +1,6 @@
 # To build, run in root of tegola source tree:
 #
-#	$ git clone git@github.com:go-spatial/tegola.git or git clone https://github.com/go-spatial/tegola.git
+#	$ git clone git@github.com:sobo-gen3v1/soboweb-tegola-cr.git or git clone https://github.com/sobo-gen3v1/soboweb-tegola-cr.git
 #	$ cd tegola
 #	$ docker build -t tegola .
 #
@@ -29,7 +29,7 @@
 # Intermediary container for building
 FROM golang:1.21.12-alpine3.20 AS build
 
-ARG BUILDPKG="github.com/go-spatial/tegola/internal/build"
+ARG BUILDPKG="github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build"
 ARG VER="Version Not Set"
 ARG BRANCH="not set"
 ARG REVISION="not set"
@@ -45,13 +45,13 @@ RUN apk update \
 	&& apk add build-base
 
 # Set up source for compilation
-RUN mkdir -p /go/src/github.com/go-spatial/tegola
-COPY . /go/src/github.com/go-spatial/tegola
+RUN mkdir -p /go/src/github.com/sobo-gen3v1/soboweb-tegola-cr
+COPY . /go/src/github.com/sobo-gen3v1/soboweb-tegola-cr
 
 RUN env
 
 # Build binary
-RUN cd /go/src/github.com/go-spatial/tegola/cmd/tegola \
+RUN cd /go/src/github.com/sobo-gen3v1/soboweb-tegola-cr/cmd/tegola \
 	&& go build -v  \
 	-ldflags "-w -X '${BUILD_PKG}.Version=${VERSION}' -X '${BUILD_PKG}.GitRevision=${GIT_REVISION}' -X '${BUILD_PKG}.GitBranch=${GIT_BRANCH}'" \
 	-gcflags "-N -l" \

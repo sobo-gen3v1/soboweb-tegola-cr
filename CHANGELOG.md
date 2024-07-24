@@ -2,21 +2,21 @@
 
 Features
 
-* [Adds configurable query parameters to tile endpoints](https://github.com/go-spatial/tegola/pull/867) (@bemyak)
-* [feat: add Google Cloud Storage cache adapter](https://github.com/go-spatial/tegola/pull/891) (@matheusmatos)
-* [HANA database provider. With this update, Tegola can use the HANA database as a backend.](https://github.com/go-spatial/tegola/pull/893)(@mrylov) 
+* [Adds configurable query parameters to tile endpoints](https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/867) (@bemyak)
+* [feat: add Google Cloud Storage cache adapter](https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/891) (@matheusmatos)
+* [HANA database provider. With this update, Tegola can use the HANA database as a backend.](https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/893)(@mrylov) 
 
 Enhancements
 
-* [MapLibre - Vue3 - Vite Migration v2](https://github.com/go-spatial/tegola/pull/926) (@mapl)
+* [MapLibre - Vue3 - Vite Migration v2](https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/926) (@mapl)
 
 Maintenance
-* [fix: viewer and update dependencies](https://github.com/go-spatial/tegola/pull/916) (@iwpnd)
+* [fix: viewer and update dependencies](https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/916) (@iwpnd)
 
 Bugs
 
-* [Updated built in viewer to resolve some security issues -- #914 ](https://github.com/go-spatial/tegola/pull/916) (@iwpnd)
-* [Prometheus will not panic now if one has both MVT and Postgres Providers -- Fix for #886]( https://github.com/go-spatial/tegola/pull/915) (@iwpnd)
+* [Updated built in viewer to resolve some security issues -- #914 ](https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/916) (@iwpnd)
+* [Prometheus will not panic now if one has both MVT and Postgres Providers -- Fix for #886]( https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/915) (@iwpnd)
 
 ## 0.16.0 (2022-12-01)
 
@@ -34,7 +34,7 @@ Enhancements
 * setting max_zoom to 0 will set it to 1 (@iwpnd)
 * seeding command now as a --log-threshold value to control logging of tiles that take longer than the given time. (@dwoznicki)
 * handle gpkg GEOMETRY as an unknown geometry and not break the capabilities if a layer contains such a geometry. (@roelarents)
-* [test: use T.Setenv to set env vars in tests](https://github.com/go-spatial/tegola/pull/882) (@Juneezee)
+* [test: use T.Setenv to set env vars in tests](https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/882) (@Juneezee)
 
 Documentation
 

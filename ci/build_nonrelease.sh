@@ -9,10 +9,10 @@ TEGOLA_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
 VERSION_TAG="nonrelease_branch_${TEGOLA_BRANCH}_hash_${TEGOLA_HASH}_geom_${GEOM_HASH}"
 
-LDFLAGS_VERSION="-X github.com/go-spatial/tegola/internal/build.Version=${VERSION_TAG}"
-LDFLAGS_BRANCH="-X github.com/go-spatial/tegola/internal/build.GitBranch=${TEGOLA_BRANCH}"
-LDFLAGS_REVISION="-X github.com/go-spatial/tegola/internal/build.GitRevision=${TEGOLA_HASH}"
+LDFLAGS_VERSION="-X github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build.Version=${VERSION_TAG}"
+LDFLAGS_BRANCH="-X github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build.GitBranch=${TEGOLA_BRANCH}"
+LDFLAGS_REVISION="-X github.com/sobo-gen3v1/soboweb-tegola-cr/internal/build.GitRevision=${TEGOLA_HASH}"
 
 LDFLAGS="-w ${LDFLAGS_VERSION} ${LDFLAGS_BRANCH} ${LDFLAGS_REVISION}"
 
-go build -ldflags "${LDFLAGS}" -o "tegola_${TEGOLA_BRANCH}" github.com/go-spatial/tegola/cmd/tegola
+go build -ldflags "${LDFLAGS}" -o "tegola_${TEGOLA_BRANCH}" github.com/sobo-gen3v1/soboweb-tegola-cr/cmd/tegola

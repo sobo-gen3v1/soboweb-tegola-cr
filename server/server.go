@@ -53,7 +53,7 @@ var (
 	// ProxyProtocol is a custom protocol that will be used to generate the URLs
 	// included in the capabilities endpoint responses. This is useful when he
 	// server sits behind a reverse proxy
-	// (See https://github.com/go-spatial/tegola/pull/967)
+	// (See https://github.com/sobo-gen3v1/soboweb-tegola-cr/pull/967)
 	ProxyProtocol string
 
 	// DefaultCORSHeaders define the default CORS response headers added to all requests
@@ -94,6 +94,10 @@ func NewRouter(a *atlas.Atlas) *httptreemux.TreeMux {
 
 	// map style
 	group.UsingContext().Handler(observability.InstrumentAPIHandler(http.MethodGet, "/maps/:map_name/style.json", o, HeadersHandler(HandleMapStyle{})))
+
+	// postgres api
+	group.UsingContext().Handler(observability.InstrumentAPIHandler(http.MethodPut, "/api/m/layers", o, HeadersHandler(HandlePutMasterLayers{})))
+	group.UsingContext().Handler(observability.InstrumentAPIHandler(http.MethodPut, "/api/c/layers", o, HeadersHandler(HandlePutCustomLayers{})))
 
 	// setup viewer routes, which can be excluded via build flags
 	setupViewer(o, group)

@@ -93,7 +93,7 @@ $ TEGOLA_SQL_DEBUG=LAYER_SQL tegola serve --config=/path/to/conf.toml
 ```
 
 ## Testing
-Testing is designed to work against a live SAP HANA database. To see how to set up a database check this [github actions script](https://github.com/go-spatial/tegola/blob/master/.github/worksflows/on_pr_push.yml). To run the HANA tests, the following environment variables need to be set:
+Testing is designed to work against a live SAP HANA database. To see how to set up a database check this [github actions script](https://github.com/sobo-gen3v1/soboweb-tegola-cr/blob/master/.github/worksflows/on_pr_push.yml). To run the HANA tests, the following environment variables need to be set:
 
 ```bash
 $ export RUN_HANA_TESTS=yes
